@@ -1,0 +1,8 @@
+
+import os
+Import("*")
+
+env=env.Clone()
+
+prg=Program("sendcommand.cpp")
+env.Alias("install",env.Install(INSTALLDIR,[prg]))
