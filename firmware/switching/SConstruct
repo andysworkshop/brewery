@@ -46,13 +46,18 @@ else:
 
 env=Environment(ENV=os.environ)
 
+# get the version string
+
+VERSION=os.popen('egrep "#define\s+FIRMWARE_VERSION" FirmwareVersion.h  | cut -d \\" -f2').read()
+VERSION=VERSION.rstrip()
+
 # compiler is avr-gcc
 
 env.Replace(CC="avr-gcc")
 env.Replace(CXX="avr-g++")
 env.Replace(PROGSUFFIX=".elf")
 
-PROGRAM = "brewery-relays"
+PROGRAM = "brewery-relays-"+mains+"hz-v"+VERSION
 
 # set up our options
 
@@ -101,8 +106,6 @@ Decider('timestamp-newer')
 # convert elf to hex flashable image
 
 hexfile=env.Command(PROGRAM+".hex",elf,"avr-objcopy -j .text -j .data -O ihex $SOURCE $TARGET")
-env.Install("bin",hexfile)
-env.Alias("install","bin")
 
 # calculate size and generate assembly source
 
@@ -118,3 +121,8 @@ upload=env.Alias("upload",PROGRAM+".hex",flash_cmd)
 fuse=env.Alias("fuse",PROGRAM+".hex",fuse_cmd)
 
 AlwaysBuild([upload,fuse])
+
+# installation
+
+env.Alias('install', "../../bin")
+env.Install("../../bin", hexfile)

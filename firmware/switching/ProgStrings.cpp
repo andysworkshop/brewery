@@ -5,6 +5,7 @@
  */
 
 #include "Application.h"
+#include "FirmwareVersion.h"
 
 
 namespace brewery {
@@ -14,7 +15,7 @@ namespace brewery {
    */
 
   const char IdString[] PROGMEM =  "\"Andy's Workshop Brewery switching controller\"";
-  const char VersionString[] PROGMEM =  "{\"hardware\":1,\"firmware\":1}";
+  const char VersionString[] PROGMEM =  "{\"hardware\":1,\"firmware\":" FIRMWARE_VERSION "}";
   const char CopyrightString[] PROGMEM = "\"Copyright (c) 2017 Andy Brown\"";
   const char CapabilitiesString[] PROGMEM = "{\"type\":\"switching\",\"relays\":[\"HEAT\",\"CHILL\",\"AUX1\"],\"triacs\":[\"AUX2\"]}";
   const char OKString[] PROGMEM =  "OK" ;
