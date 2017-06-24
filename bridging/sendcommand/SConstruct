@@ -1,0 +1,8 @@
+import os
+
+env = Environment(ENV = os.environ)
+
+prg = Program("sendcommand.cpp")
+
+env.Alias("install","../../bin")
+env.Install("../../bin", prg)
