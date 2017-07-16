@@ -42,9 +42,9 @@ namespace brewery {
         if((faultCode & 0xfe)!=0)           // display "Err" if fault code present
           Max7221::displayText(display,"Err");
         else if(adjusted<=-10)              // display "lo" if too far negative
-          Max7221::displayText(display,"lo ");
-        else if(adjusted>=1000)             // display "out" if out of range
-          Max7221::displayText(display,"out");
+          Max7221::displayText(display,"LO ");
+        else if(adjusted>=1000)             // display "hi" if out of range
+          Max7221::displayText(display,"HI ");
         else {
 
           if(adjusted>=100)     // display an integer if >100
