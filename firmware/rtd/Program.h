@@ -33,6 +33,10 @@ namespace brewery {
    
     _lastReadingsTime=0;
 
+    // check the EEPROM
+
+    Eeprom::verifyState();
+
     // setup peripherals
 
     GpioResetLtc2986::setup();
@@ -41,8 +45,11 @@ namespace brewery {
 
     // setup the SPI pins
 
-    GpioSpiCs::setup();
-    GpioSpiCs::set();
+    GpioSpiCsLtc2986::setup();
+    GpioSpiCsLtc2986::set();
+
+    GpioSpiCsLed::setup();
+    GpioSpiCsLed::set();
 
     GpioSpiMiso::setup();
     GpioSpiMosi::setup();
@@ -51,6 +58,7 @@ namespace brewery {
     // initialisers
 
     MillisecondTimer::setup();
+    Max7221::setup();
   }  
 
 
@@ -89,6 +97,7 @@ namespace brewery {
       if(_lastReadingsTime==0 || MillisecondTimer::hasTimedOut(_lastReadingsTime,1000)) {
         LTC2986::run(_lastReadings);
         _lastReadingsTime=MillisecondTimer::millis();
+        _lastReadings.display();
       }
 
       // check for commands to process

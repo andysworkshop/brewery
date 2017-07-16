@@ -190,7 +190,7 @@ namespace brewery {
       
     int8_t i;
 
-    GpioSpiCs::reset();
+    GpioSpiCsLtc2986::reset();
     
     for(i=length-1;i>=0;i--) {
 
@@ -199,7 +199,7 @@ namespace brewery {
       rx[i]=SPDR;                     // get the incoming byte 
     }
     
-    GpioSpiCs::set();
+    GpioSpiCsLtc2986::set();
   }
 
 

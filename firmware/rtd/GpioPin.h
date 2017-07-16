@@ -153,11 +153,19 @@ namespace brewery {
 
   typedef GpioInputPin<GPIOD,0> GpioUartRx;
   typedef GpioOutputPin<GPIOD,1> GpioUartTx;
-  typedef GpioOutputPin<GPIOC,3> GpioResetUsb;
-  typedef GpioOutputPin<GPIOD,5> GpioResetLtc2986;
+  typedef GpioOutputPin<GPIOB,0> GpioResetUsb;
+  typedef GpioOutputPin<GPIOD,7> GpioResetLtc2986;
 
-  typedef GpioOutputPin<GPIOB,2> GpioSpiCs;
-  typedef GpioOutputPin<GPIOB,3> GpioSpiMosi;
+  typedef GpioOutputPin<GPIOB,2> GpioSpiCsLtc2986;
+  typedef GpioOutputPin<GPIOC,0> GpioSpiCsLed;
   typedef GpioInputPin<GPIOB,4> GpioSpiMiso;
   typedef GpioOutputPin<GPIOB,5> GpioSpiClk;
+
+  struct GpioSpiMosi : GpioOutputPin<GPIOB,3> {
+
+    static void writeByte(uint8_t b) {
+      SPDR=b;
+      while(!(SPSR & (1 << SPIF)));
+    }
+  };
 }
