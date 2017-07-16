@@ -21,26 +21,36 @@ namespace brewery {
       double directAdcReading;
       int32_t directAdcCode;
 
+
       /*
-       * Display one of the readings on a display
+       * Display one of the readings on a display after adjusting the raw
+       * reading with the appropriate calibration value
        */
 
       void display(Max7221::Display display) {
 
         char buffer[20];
+        double adjusted=temperature;
+
+        // adjust the temperature with the calibration value
+
+        if(display==Max7221::Display::BLUE)
+          adjusted+=Eeprom::Reader::blueCal();
+        else
+          adjusted+=Eeprom::Reader::redCal();
 
         if((faultCode & 0xfe)!=0)           // display "Err" if fault code present
           Max7221::displayText(display,"Err");
-        else if(temperature<0)              // display "lo" if negative
+        else if(adjusted<=-10)              // display "lo" if too far negative
           Max7221::displayText(display,"lo ");
-        else if(temperature>=1000)          // display "out" if out of range
+        else if(adjusted>=1000)             // display "out" if out of range
           Max7221::displayText(display,"out");
         else {
 
-          if(temperature>=100)     // display an integer if >100
-            sprintf(buffer,"%d",(int)temperature);
+          if(adjusted>=100)     // display an integer if >100
+            sprintf(buffer,"%d",(int)adjusted);
           else                          // display a fraction if <100
-            sprintf(buffer,"%4.1f",temperature);
+            sprintf(buffer,"%4.1f",adjusted);
 
           Max7221::displayText(display,buffer);
         }

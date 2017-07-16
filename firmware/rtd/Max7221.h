@@ -132,6 +132,7 @@ namespace brewery {
     // get first digit
 
     int digit=static_cast<int>(display==BLUE ? DIGIT4 : DIGIT0);
+    
     for(int i=digit;i<digit+3;i++)
       writeByte(i,0);
   }
@@ -148,6 +149,7 @@ namespace brewery {
     uint8_t count;
 
     count=0;
+    
     for(const char *ptr=str;*ptr;ptr++) {
        
       uint8_t value=pgm_read_byte_near(charTable+*ptr); 
