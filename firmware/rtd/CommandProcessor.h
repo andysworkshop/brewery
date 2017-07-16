@@ -47,6 +47,10 @@ namespace brewery {
       Uptime::run();
     else if(!strcasecmp("READINGS",commandPtr))
       Readings::run(rtdReadings);
+    else if(!strcasecmp("RCAL",commandPtr))
+      Calibration::red();
+    else if(!strcasecmp("BCAL",commandPtr))
+      Calibration::blue();
     else
       Uart::sendString(UnknownCommandString,true);
   }

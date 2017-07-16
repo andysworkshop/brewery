@@ -31,6 +31,7 @@
 #include "LTC2986Constants.h"
 #include "RtdReadings.h"
 #include "LTC2986.h"
+#include "Calibration.h"
 #include "Id.h"
 #include "Copyright.h"
 #include "Version.h"
