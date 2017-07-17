@@ -32,22 +32,37 @@ namespace brewery {
 
   inline void Calibration::cal(Eeprom::Location which) {
 
-    // get the parameter. there must be one
+    // get the optional parameter
 
+    double cal;
     char *parameter=strtok(nullptr," ");
 
     if(parameter==nullptr) {
-      Uart::sendString(MissingParameterString,true);
-      return;
+
+      // respond with the current value
+
+      if(which==Eeprom::Location::REDCAL)
+        cal=Eeprom::Reader::redCal();
+      else
+        cal=Eeprom::Reader::blueCal();
+
+      char buffer[100];
+      sprintf(buffer,"\"%f\"",cal);
+
+      Uart::sendString(buffer,false);
     }
+    else {
 
-    double cal=strtod(parameter,nullptr);
+      // store the new value
 
-    if(which==Eeprom::Location::REDCAL)
-      Eeprom::Writer::redCal(cal);
-    else
-      Eeprom::Writer::blueCal(cal);
+      cal=strtod(parameter,nullptr);
 
-    Uart::ok();
+      if(which==Eeprom::Location::REDCAL)
+        Eeprom::Writer::redCal(cal);
+      else
+        Eeprom::Writer::blueCal(cal);
+
+      Uart::ok();
+    }
   }
 }
