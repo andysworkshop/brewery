@@ -14,7 +14,7 @@ namespace brewery {
    */
 
   const char IdString[] PROGMEM =  "\"Andy's Workshop Brewery RTD temperature sensors\"";
-  const char CapabilitiesString[] PROGMEM = "{\"type\":\"rtd\",\"names\": [ \"RED\",\"BLUE\"]}";
+  const char CapabilitiesString[] PROGMEM = "{\"type\":\"rtd\",\"impl\":\"ltc2986\",\"names\": [ \"red\",\"blue\"]}";
   const char VersionString[] PROGMEM =  "{\"hardware\":1,\"firmware\":1}";
   const char OKString[] PROGMEM =  "\"OK\"\r\n" ;
   const char UnknownCommandString[] PROGMEM = "ERROR:00:Unknown command";
