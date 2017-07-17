@@ -24,14 +24,18 @@ namespace brewery {
 
   inline void Readings::run(RtdReadings& rtdReadings) {
 
-    static char buffer[100];
+    // shouldn't exceed 100 but be safe
 
-    sprintf(buffer,"GREEN:%f:%u;RED:%f:%u\r\n",
-      rtdReadings.rtd1.temperature,
-      rtdReadings.rtd1.faultCode,
-      rtdReadings.rtd2.temperature,
-      rtdReadings.rtd2.faultCode);
-    
+    char buffer[150];
+
+    sprintf(
+      buffer,
+      "{\"red\":{\"value\":\"%f\",\"code\":\"%u\"},\"blue\":{\"value\":\"%f\",\"code\":\"%u\"}}",
+      rtdReadings.rtd2.temperature+Eeprom::Reader::redCal(),
+      rtdReadings.rtd2.faultCode,
+      rtdReadings.rtd1.temperature+Eeprom::Reader::blueCal(),
+      rtdReadings.rtd1.faultCode);
+
     Uart::sendString(buffer,false);
   }
 }
