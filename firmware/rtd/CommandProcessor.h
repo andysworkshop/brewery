@@ -51,6 +51,10 @@ namespace brewery {
       Calibration::red();
     else if(!strcasecmp("BCAL",commandPtr))
       Calibration::blue();
+    else if(!strcasecmp("RCALDATE",commandPtr))
+      Calibration::redDate();
+    else if(!strcasecmp("BCALDATE",commandPtr))
+      Calibration::blueDate();
     else
       Uart::sendString(UnknownCommandString,true);
   }

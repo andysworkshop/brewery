@@ -285,7 +285,7 @@ namespace brewery {
    */
 
   inline void Eeprom::Writer::redCalDate(uint32_t u) {
-    writeDouble(Location::REDCALDATE,u);
+    writeUint32(Location::REDCALDATE,u);
   }
 
 
