@@ -121,8 +121,17 @@ namespace brewery {
 
         _commandReady=true;
       }
-      else
-        _receiveBuffer[_receiveBufferPos++]=c;
+      else {
+
+        // ~ is the reset character. If we see this then the buffer is reset
+        // to empty.
+
+        if(c=='~') {
+          _receiveBufferPos=0;
+        }
+        else 
+          _receiveBuffer[_receiveBufferPos++]=c;
+      }
     }
   }
   
