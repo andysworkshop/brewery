@@ -57,7 +57,8 @@ namespace brewery {
 
   /*
    * send a string, optionally from PROGMEM. The client will be waiting for this response
-   * so it's send synchronously because nothing else will be going on.
+   * so it's send synchronously because nothing else will be going on. That means the
+   * caller can pass buffer on the stack if necessary.
    */
 
   inline void Uart::sendString(const char *buffer,bool progmem) {

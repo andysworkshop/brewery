@@ -27,7 +27,8 @@ namespace brewery {
       REDCAL      = 4,      // 4 bytes (0)
       REDCALDATE  = 8,      // 4 bytes (0)
       BLUECAL     = 12,     // 4 bytes (0)
-      BLUECALDATE = 16      // 4 bytes (0)
+      BLUECALDATE = 16,     // 4 bytes (0)
+      SERIAL      = 20      // 4 bytes (BOARD_SERIAL macro)
     };
 
 
@@ -36,7 +37,7 @@ namespace brewery {
      */
 
     enum {
-      MAGIC_NUMBER = 0x55aa
+      MAGIC_NUMBER = 0xaa55
     };
 
 
@@ -65,6 +66,7 @@ namespace brewery {
         static uint32_t blueCalDate();
         static double redCal();
         static uint32_t redCalDate();
+        static uint32_t serial();
     };
 
     /*
@@ -84,6 +86,7 @@ namespace brewery {
       static void blueCalDate(uint32_t u);
       static void redCal(double d);
       static void redCalDate(uint32_t u);
+      static void serial();
     };
   };
 
@@ -178,6 +181,15 @@ namespace brewery {
 
   inline uint32_t Eeprom::Reader::redCalDate() {
     return readUint32(Location::REDCALDATE);
+  }
+
+
+  /*
+   * Read the serial number
+   */
+
+  inline uint32_t Eeprom::Reader::serial() {
+    return readUint32(Location::SERIAL);
   }
 
 
@@ -290,6 +302,15 @@ namespace brewery {
 
 
   /*
+   * Write the board serial number
+   */
+
+  inline void Eeprom::Writer::serial() {
+    writeUint32(Location::SERIAL,BOARD_SERIAL);
+  }
+
+
+  /*
    * Verify the content and default it if invalid
    */
 
@@ -318,6 +339,7 @@ namespace brewery {
     Writer::redCal(0);
     Writer::blueCalDate(0);
     Writer::redCalDate(0);
+    Writer::serial();
 
     Writer::magic();
   }

@@ -35,6 +35,7 @@
 #include "Id.h"
 #include "Copyright.h"
 #include "Version.h"
+#include "Serial.h"
 #include "Capabilities.h"
 #include "Uptime.h"
 #include "Readings.h"

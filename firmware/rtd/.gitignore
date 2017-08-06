@@ -4,5 +4,6 @@
 *.lst
 *.hex
 *.o
+serialnumber.txt
 .sconsign.dblite
 .settings/

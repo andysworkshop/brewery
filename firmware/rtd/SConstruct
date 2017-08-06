@@ -14,10 +14,32 @@ To do a parallel build use the -jN flag
 """
 
 import os
+import random
+
+
+#
+# create a random uuid if not already present
+#
+
+def createSerialNumber():
+
+  if not os.path.exists("serialnumber.txt"):
+    with open("serialnumber.txt", "w") as f:
+      f.write(str(random.randrange(0,4294967295)))
+
+  with open("serialnumber.txt", "r") as f:
+    serial = f.read()
+
+  return serial
+
 
 # source the environment
 
 env=Environment(ENV=os.environ)
+
+# check for and create the serial number
+
+serial = createSerialNumber()
 
 # compiler is avr-gcc
 
@@ -33,6 +55,7 @@ env.Replace(CXXFLAGS=["-mmcu=atmega328p",
                       "-Os",
                       "-g",
                       "-DF_CPU=8000000",
+                      "-DBOARD_SERIAL=" + serial,
                       "-std=c++1y",
                       "-Wall",
                       "-Werror",
@@ -48,6 +71,7 @@ env.Replace(CFLAGS=["-mmcu=atmega328p",
                       "-Os",
                       "-g",
                       "-DF_CPU=8000000",
+                      "-DBOARD_SERIAL=" + serial,
                       "-std=c99",
                       "-Wall",
                       "-Werror",

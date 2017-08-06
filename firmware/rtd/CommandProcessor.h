@@ -55,6 +55,8 @@ namespace brewery {
       Calibration::redDate();
     else if(!strcasecmp("BCALDATE",commandPtr))
       Calibration::blueDate();
+    else if(!strcasecmp("SERIAL",commandPtr))
+      Serial::run();
     else
       Uart::sendString(UnknownCommandString,true);
   }
