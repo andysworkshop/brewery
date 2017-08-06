@@ -100,6 +100,8 @@ namespace brewery {
       Uptime::run();
     else if(!strcasecmp("VALID",commandPtr))
       Valid::run();
+    else if(!strcasecmp("SERIAL",commandPtr))
+      Serial::run();
     else
       Uart::sendString(UnknownCommandString,true);
   }

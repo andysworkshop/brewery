@@ -35,6 +35,7 @@
 #include "Capabilities.h"
 #include "Copyright.h"
 #include "Version.h"
+#include "Serial.h"
 #include "Uptime.h"
 #include "Valid.h"
 #include "Program.h"
