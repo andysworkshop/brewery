@@ -22,6 +22,7 @@
 #include <avr/eeprom.h>
 #include <avr/wdt.h>
  
+#include "FirmwareVersion.h"
 #include "GpioPin.h"
 #include "ProgStrings.h"
 #include "MillisecondTimer.h"
