@@ -57,6 +57,8 @@ namespace brewery {
       Calibration::blueDate();
     else if(!strcasecmp("SERIAL",commandPtr))
       Serial::run();
+    else if(!strcasecmp("ALARM",commandPtr))
+      Alarm::run();
     else
       Uart::sendString(UnknownCommandString,true);
   }

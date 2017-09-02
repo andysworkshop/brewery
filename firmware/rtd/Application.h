@@ -33,6 +33,7 @@
 #include "RtdReadings.h"
 #include "LTC2986.h"
 #include "Calibration.h"
+#include "Alarm.h"
 #include "Id.h"
 #include "Copyright.h"
 #include "Version.h"
@@ -42,3 +43,4 @@
 #include "Readings.h"
 #include "CommandProcessor.h"
 #include "Program.h"
+#include "Alarm.h"

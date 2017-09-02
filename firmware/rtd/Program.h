@@ -55,6 +55,10 @@ namespace brewery {
     GpioSpiMosi::setup();
     GpioSpiClk::setup();
 
+    // set up the GPIO pins
+
+    GpioAlarm::setup();
+
     // initialisers
 
     MillisecondTimer::setup();

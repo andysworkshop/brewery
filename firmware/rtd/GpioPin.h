@@ -161,6 +161,8 @@ namespace brewery {
   typedef GpioInputPin<GPIOB,4> GpioSpiMiso;
   typedef GpioOutputPin<GPIOB,5> GpioSpiClk;
 
+  typedef GpioOutputPin<GPIOD,2> GpioAlarm;
+
   struct GpioSpiMosi : GpioOutputPin<GPIOB,3> {
 
     static void writeByte(uint8_t b) {

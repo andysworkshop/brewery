@@ -16,7 +16,7 @@ namespace brewery {
   const char IdString[] PROGMEM =  "\"Andy's Workshop Brewery RTD temperature sensors\"";
   const char CapabilitiesString[] PROGMEM = "{\"type\":\"rtd\",\"impl\":\"ltc2986\",\"names\": [ \"red\",\"blue\"]}";
   const char VersionString[] PROGMEM =  "{\"hardware\":1,\"firmware\":" FIRMWARE_VERSION "}";
-  const char OKString[] PROGMEM =  "\"OK\"\r\n" ;
+  const char OKString[] PROGMEM =  "\"OK\"" ;
   const char UnknownCommandString[] PROGMEM = "ERROR:00:Unknown command";
   const char MissingParameterString[] PROGMEM = "ERROR:01:Missing parameter" ;
   const char UnknownParameterString[] PROGMEM = "ERROR:02:Unknown parameter";
