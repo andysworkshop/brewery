@@ -17,6 +17,7 @@ namespace brewery {
 
     public:
       static void run();
+      static void setLed();
   };
 
 
@@ -35,15 +36,43 @@ namespace brewery {
     else {
 
       if(!strcasecmp("ON",parameter))
-        GpioAlarm::set();
+        Eeprom::Writer::alarmState(AlarmState::ON);
       else if(!strcasecmp("OFF",parameter))
-        GpioAlarm::reset();
+        Eeprom::Writer::alarmState(AlarmState::OFF);
+      else if(!strcasecmp("FLASH",parameter))
+        Eeprom::Writer::alarmState(AlarmState::FLASH);
       else {
         Uart::sendString(UnknownParameterString,true);
         return;
       }
 
+      setLed();
       Uart::ok();
+    }
+  }
+
+
+  /*
+   * Set the LED from the EEPROM value
+   */
+
+  inline void Alarm::setLed() {
+
+    switch(Eeprom::Reader::alarmState()) {
+
+      case AlarmState::ON:
+        AlarmFlasher::off();
+        GpioAlarm::set();
+        break;
+
+      case AlarmState::FLASH:
+        AlarmFlasher::on();
+        break;
+
+      default:
+        AlarmFlasher::off();
+        GpioAlarm::reset();
+        break;
     }
   }
 }

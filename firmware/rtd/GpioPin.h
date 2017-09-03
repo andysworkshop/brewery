@@ -81,6 +81,28 @@ namespace brewery {
       else
         reset();
     }
+
+
+    /*  
+     * Read the current value of a GPIO pin. Pin states can be read
+     * regardless of direction.
+     */
+
+    static bool read() {
+      
+      uint8_t r;
+
+      asm volatile(
+          "  clr  %[result]       \n\t"       // result = 0
+          "  sbic %[port],%[pin]  \n\t"       // skip next if port bit is clear
+          "  inc  %[result]       \n\t"       // result = 1
+        : [result] "=r" (r)
+        : [port]   "I"  (TPort),
+          [pin]    "I"  (TPin)
+      );
+
+      return r;
+    }
   };
 
 
@@ -122,27 +144,6 @@ namespace brewery {
         :: [port] "I" (TPort::Dir),
            [pin]  "I" (TPin)
       );
-    }
-
-
-    /*
-     * Read the current value of an input pin
-     */
-
-    static bool read() {
-      
-      uint8_t r;
-
-      asm volatile(
-          "  clr  %[result]       \n\t"       // result = 0
-          "  sbic %[port],%[pin]  \n\t"       // skip next if port bit is clear
-          "  inc  %[result]       \n\t"       // result = 1
-        : [result] "=r" (r)
-        : [port]   "I"  (TPort::Pin),
-          [pin]    "I"  (TPin)
-      );
-
-      return r;
     }
   };
 

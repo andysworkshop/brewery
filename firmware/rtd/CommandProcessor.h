@@ -59,6 +59,8 @@ namespace brewery {
       Serial::run();
     else if(!strcasecmp("ALARM",commandPtr))
       Alarm::run();
+    else if(!strcasecmp("DISPLAYS",commandPtr))
+      Displays::run();
     else
       Uart::sendString(UnknownCommandString,true);
   }

@@ -55,9 +55,14 @@ namespace brewery {
     GpioSpiMosi::setup();
     GpioSpiClk::setup();
 
-    // set up the GPIO pins
+    // set up the alarm
 
     GpioAlarm::setup();
+    AlarmFlasher::setup();
+    
+    // restore from whatever the previous state was
+    
+    Alarm::setLed();
 
     // initialisers
 

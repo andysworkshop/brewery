@@ -28,7 +28,8 @@ namespace brewery {
       REDCALDATE  = 8,      // 4 bytes (0)
       BLUECAL     = 12,     // 4 bytes (0)
       BLUECALDATE = 16,     // 4 bytes (0)
-      SERIAL      = 20      // 4 bytes (BOARD_SERIAL macro)
+      SERIAL      = 20,     // 4 bytes (BOARD_SERIAL macro)
+      ALARM       = 24      // 1 bytes (alarm state)
     };
 
 
@@ -67,6 +68,7 @@ namespace brewery {
         static double redCal();
         static uint32_t redCalDate();
         static uint32_t serial();
+        static AlarmState alarmState();
     };
 
     /*
@@ -87,6 +89,7 @@ namespace brewery {
       static void redCal(double d);
       static void redCalDate(uint32_t u);
       static void serial();
+      static void alarmState(AlarmState state);
     };
   };
 
@@ -201,6 +204,17 @@ namespace brewery {
     return eeprom_read_byte(reinterpret_cast<uint8_t *>(Location::DISPLAYS));
   }
 
+  
+  /*
+   * Read the alarm state
+   */
+
+  inline AlarmState Eeprom::Reader::alarmState() {
+    return static_cast<AlarmState>(
+        eeprom_read_byte(reinterpret_cast<uint8_t *>(Location::ALARM))
+      );
+  }
+
 
   /*
    * Write a byte to the location
@@ -311,6 +325,15 @@ namespace brewery {
 
 
   /*
+   * Write the alarm state
+   */
+
+  inline void Eeprom::Writer::alarmState(AlarmState state) {
+    eeprom_write_byte(reinterpret_cast<uint8_t *>(Location::ALARM),state);
+  }
+
+
+  /*
    * Verify the content and default it if invalid
    */
 
@@ -340,6 +363,7 @@ namespace brewery {
     Writer::blueCalDate(0);
     Writer::redCalDate(0);
     Writer::serial();
+    Writer::alarmState(AlarmState::OFF);
 
     Writer::magic();
   }
