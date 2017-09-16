@@ -1,0 +1,9 @@
+*.elf
+*.siz
+*.map
+*.lst
+*.hex
+*.o
+serialnumber.txt
+.sconsign.dblite
+.settings/
