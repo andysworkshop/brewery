@@ -37,3 +37,9 @@ This small article introduces you to the whole concept of process control and wh
 This article breaks down the relays and triacs project. Schematics, gerbers etc. are all available for download. Click the image to view it.
 
 [![Click to view article](http://andybrown.me.uk/wp-content/images/brewery/system/relays/built.jpg)](http://andybrown.me.uk/2017/05/21/switchgear)
+
+### Temperature sensing
+
+This article introduces the temperature sensing project where I aim to accurately sense a number of independent temperatures so that I can make switching decisions. Schematics, gerbers etc. are all available for download. Click the image to view it.
+
+[![Click to view article](http://andybrown.me.uk/wp-content/images//brewery/system/temperature/ebay-stainless-reading.jpg)](http://andybrown.me.uk/2017/09/02/temperature/)
