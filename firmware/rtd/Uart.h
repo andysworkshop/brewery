@@ -86,9 +86,6 @@ namespace brewery {
       else
         c=*buffer;
 
-      while(!(UCSR0A & (1<<UDRE0)));
-      UDR0=c;
-
       if(c) {
         while(!(UCSR0A & (1<<UDRE0)));
         UDR0=c;
