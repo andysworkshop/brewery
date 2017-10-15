@@ -21,6 +21,7 @@
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
 #include <avr/wdt.h>
+#include <util/crc16.h>
  
 #include "FirmwareVersion.h"
 #include "GpioPin.h"
