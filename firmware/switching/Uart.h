@@ -26,6 +26,9 @@ namespace brewery {
       volatile static char _receiveBuffer[MAX_COMMAND_SIZE];
       uint8_t static _receiveBufferPos;              // next position to store data
 
+    protected:
+      static void sendChecksum(const char *buffer,bool progmem);
+
     public:
       static void setup();
       static void sendString(const char *buffer,bool progmem);
@@ -67,6 +70,12 @@ namespace brewery {
 
     MillisecondTimer::delay(500);
 
+    // first send the 16-bit checksum
+
+    sendChecksum(buffer,progmem);
+
+    // send the data
+
     char c;
 
     do {
@@ -76,10 +85,11 @@ namespace brewery {
       else
         c=*buffer;
 
-      while(!(UCSR0A & (1<<UDRE0)));
-      UDR0=c;
-
-      buffer++;
+      if(c) {
+        while(!(UCSR0A & (1<<UDRE0)));
+        UDR0=c;
+        buffer++;
+      }
 
     } while(c);
 
@@ -94,6 +104,43 @@ namespace brewery {
 
     _receiveBufferPos=0;
     _commandReady=false;
+  }
+
+
+  /**
+   * Send the 16-bit checksum as ASCII followed by ":"
+   */
+
+  inline void Uart::sendChecksum(const char *buffer,bool progmem) {
+
+    // do the calculation
+
+    uint8_t b;
+    uint16_t crc;
+
+    crc=0;
+
+    do {
+
+      if(progmem)
+        b=pgm_read_byte_near(buffer);
+      else
+        b=*buffer;
+
+      if(b) {
+        crc=_crc16_update(crc,b);
+        buffer++;
+      }
+
+    } while(b);
+
+    char output[20];
+    sprintf(output,"%u:",crc);
+
+    for(char *ptr=output;*ptr;ptr++) {
+      while(!(UCSR0A & (1<<UDRE0)));
+      UDR0=*ptr;
+    }
   }
 
 
