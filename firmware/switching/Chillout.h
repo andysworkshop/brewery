@@ -25,12 +25,14 @@ namespace brewery {
 
   inline void Chillout::run() {
 
-    // get the parameter. there must be one
+    // get the parameter. if none, echo the current value
 
     char *parameter=strtok(nullptr," ");
     
     if(parameter==nullptr) {
-      Uart::sendString(MissingParameterString,true);
+      char buffer[100];
+      sprintf(buffer,"\"%lu\"",Eeprom::Reader::chillBlackout());
+      Uart::sendString(buffer,false);
       return;
     }
 

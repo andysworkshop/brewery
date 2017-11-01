@@ -54,7 +54,7 @@ namespace brewery {
 
       // want to switch on and we have remembered the last off time
 
-      if(MillisecondTimer::hasTimedOut(_lastOffTime,Eeprom::Reader::chillBlackout())) {
+      if(!MillisecondTimer::hasTimedOut(_lastOffTime,Eeprom::Reader::chillBlackout())) {
         Uart::sendString(ChillerBlackoutString,true);
         return;
       }
