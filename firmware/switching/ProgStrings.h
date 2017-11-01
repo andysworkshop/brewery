@@ -20,4 +20,5 @@ namespace brewery {
   extern const char CopyrightString[];
   extern const char InvalidStateString[];
   extern const char RelayTimeoutString[];
+  extern const char ChillerBlackoutString[];
 }

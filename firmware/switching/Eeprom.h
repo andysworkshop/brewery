@@ -21,9 +21,10 @@ namespace brewery {
      */
 
     enum Location : uint8_t {
-      MAGIC       = 0,     // 2 byte signature
-      VALID_MASKS = 2,     // 4 bytes
-      SERIAL      = 6      // 4 bytes (BOARD_SERIAL macro)
+      MAGIC          = 0,     // 2 byte signature
+      VALID_MASKS    = 2,     // 4 bytes
+      SERIAL         = 6,     // 4 bytes (BOARD_SERIAL macro)
+      CHILL_BLACKOUT = 10     // 4 bytes blackout period in millis
     };
 
     
@@ -52,6 +53,7 @@ namespace brewery {
 
         static uint8_t validMask(uint8_t index);
         static uint32_t serial();
+        static uint32_t chillBlackout();
     };
 
 
@@ -66,6 +68,7 @@ namespace brewery {
 
       static void validMask(uint8_t index,uint8_t b);
       static void serial();
+      static void chillBlackout(uint32_t b);
     };
   };
 
@@ -119,6 +122,15 @@ namespace brewery {
 
 
   /*
+   * Read the chill blackout
+   */
+
+  inline uint32_t Eeprom::Reader::chillBlackout() {
+    return readUint32(Location::CHILL_BLACKOUT);
+  }
+
+
+  /*
    * Write a byte to the location
    */
 
@@ -164,6 +176,15 @@ namespace brewery {
 
 
   /*
+   * Write the chill blackout
+   */
+
+  inline void Eeprom::Writer::chillBlackout(uint32_t b) {
+    writeUint32(Location::CHILL_BLACKOUT,b);
+  }
+
+
+  /*
    * Verify the content and default it if invalid
    */
 
@@ -191,6 +212,7 @@ namespace brewery {
     Writer::validMask(ValidMask::VALID_MASK_AUX1,0b0010);
     Writer::validMask(ValidMask::VALID_MASK_AUX2,0b0001);
 
+    Writer::chillBlackout(300000l);  // 5 minutes
     Writer::serial();
     Writer::magic();
   }

@@ -19,6 +19,10 @@ namespace brewery {
     public:
       uint32_t _lastSwitchingTime;
 
+    protected:
+      void activate(uint8_t& currentMask,uint8_t newMask,int8_t action) const;
+      int8_t validate(const uint8_t currentMask,uint8_t& newMask);
+
     public:
       Relay();
       void run(uint8_t& currentMask);
@@ -42,19 +46,34 @@ namespace brewery {
   template<class T,uint8_t TValidMask>
   inline void Relay<T,TValidMask>::run(uint8_t& currentMask) {
 
+    int8_t action;
+    uint8_t newMask;
+
+    action = validate(currentMask,newMask);
+    if(action!=-1)
+      activate(currentMask,newMask,action);
+  }
+
+
+  /*
+   * validate command and return 1 if ON, 0 if OFF, and -1 if fail. If fail then a 
+   * response has already been sent
+   */
+
+  template<class T,uint8_t TValidMask>
+  inline int8_t Relay<T,TValidMask>::validate(const uint8_t currentMask,uint8_t& newMask) {
+
     // get the parameter. there must be one
 
     char *parameter=strtok(nullptr," ");
     
     if(parameter==nullptr) {
       Uart::sendString(MissingParameterString,true);
-      return;
+      return -1;
     }
 
     // check for valid options
     
-    uint8_t newMask;
-
     if(!strcasecmp(parameter,"ON")) {
 
       // calculate the proposed new mask
@@ -66,20 +85,19 @@ namespace brewery {
       uint8_t validMask=Eeprom::Reader::validMask(TValidMask);
       if((newMask & validMask) != newMask) {
         Uart::sendString(InvalidStateString,true);
-        return;
+        return -1;
       }
 
       // to protect the relay from crazy software we do not allow switching
       // more often than once every 10 seconds
 
       if(_lastSwitchingTime==0 || MillisecondTimer::hasTimedOut(_lastSwitchingTime,10000)) {
-        T::set();
-        Uart::ok();
         _lastSwitchingTime=MillisecondTimer::millis();
+        return 1;
       }
       else {
         Uart::sendString(RelayTimeoutString,true);
-        return;
+        return -1;
       }
     }
     else if(!strcasecmp(parameter,"OFF")) {
@@ -87,22 +105,33 @@ namespace brewery {
       // turning something off is always permitted
 
       newMask=currentMask &~ (1 << TValidMask);
-
-      T::reset();
-      Uart::ok();
+      return 0;
     }
     else {
       Uart::sendString(UnknownParameterString,true);
-      return;
+      return -1;
     }
-
-    currentMask=newMask;
   }
 
 
-  // relays onboard
+  /*
+   * Switch the relay and store the current mask
+   */
+
+  template<class T,uint8_t TValidMask>
+  inline void Relay<T,TValidMask>::activate(uint8_t& currentMask,uint8_t newMask,int8_t action) const {
+
+    if(action==1)
+      T::set();
+    else
+      T::reset();
+
+    currentMask=newMask;
+    Uart::ok();
+  }
+
+  // basic relays onboard
 
   typedef Relay<GpioHeater,ValidMask::VALID_MASK_HEAT> Heater;
-  typedef Relay<GpioChiller,ValidMask::VALID_MASK_CHILL> Chiller;
   typedef Relay<GpioAux1,ValidMask::VALID_MASK_AUX1> Aux1;
 }
