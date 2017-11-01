@@ -17,7 +17,6 @@ namespace brewery {
 
     protected:
       uint32_t _lastOffTime;
-      uint32_t _blackoutTime;
 
     public:
       Chiller();
@@ -30,9 +29,7 @@ namespace brewery {
    */
 
   inline Chiller::Chiller() {
-
     _lastOffTime=0;
-    _blackoutTime=Eeprom::Reader::chillBlackout();
   }
 
 
@@ -57,7 +54,7 @@ namespace brewery {
 
       // want to switch on and we have remembered the last off time
 
-      if(MillisecondTimer::hasTimedOut(_lastOffTime,_blackoutTime)) {
+      if(MillisecondTimer::hasTimedOut(_lastOffTime,Eeprom::Reader::chillBlackout())) {
         Uart::sendString(ChillerBlackoutString,true);
         return;
       }

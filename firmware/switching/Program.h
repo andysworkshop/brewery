@@ -102,6 +102,8 @@ namespace brewery {
       Valid::run();
     else if(!strcasecmp("SERIAL",commandPtr))
       Serial::run();
+    else if(!strcasecmp("CHILLOUT",commandPtr))
+      Chillout::run();
     else
       Uart::sendString(UnknownCommandString,true);
   }

@@ -40,4 +40,5 @@
 #include "Serial.h"
 #include "Uptime.h"
 #include "Valid.h"
+#include "Chillout.h"
 #include "Program.h"
