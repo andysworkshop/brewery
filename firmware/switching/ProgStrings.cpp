@@ -24,6 +24,4 @@ namespace brewery {
   const char UnknownParameterString[] PROGMEM = "ERROR:02:Unknown parameter";
   const char OutOfRangeString[] PROGMEM = "ERROR:03:Parameter out of range";
   const char InvalidStateString[] PROGMEM = "ERROR:04:Invalid controls state";
-  const char RelayTimeoutString[] PROGMEM = "ERROR:05:Relay 10s blackout active";
-  const char ChillerBlackoutString[] PROGMEM = "WARNING:05:Chiller blackout period active";
 }

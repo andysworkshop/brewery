@@ -155,9 +155,28 @@ namespace brewery {
   typedef GpioInputPin<GPIOD,0> GpioUartRx;
   typedef GpioOutputPin<GPIOD,1> GpioUartTx;
   typedef GpioOutputPin<GPIOD,4> GpioResetUsb;
-  typedef GpioOutputPin<GPIOB,0> GpioAux1;
-  typedef GpioOutputPin<GPIOB,1> GpioHeater;
-  typedef GpioOutputPin<GPIOB,2> GpioChiller;
+
+  // AUX1 and HEAT don't have blackout periods
+
+  struct GpioAux1 : GpioOutputPin<GPIOB,0> {
+    static constexpr uint32_t getBlackoutPeriod() {
+      return 0;
+    }
+  };
+
+  struct GpioHeater : GpioOutputPin<GPIOB,1> {
+    static constexpr uint32_t getBlackoutPeriod() {
+      return 0;
+    }
+  };
+
+  // CHILL has a configurable blackout
+  
+  struct GpioChiller : GpioOutputPin<GPIOB,2> {
+    static uint32_t getBlackoutPeriod() {
+      return Eeprom::Reader::chillBlackout();
+    }
+  };
 
   struct GpioZeroSense : GpioInputPin<GPIOD,2> {
     

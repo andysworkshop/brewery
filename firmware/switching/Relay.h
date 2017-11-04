@@ -17,15 +17,23 @@ namespace brewery {
   class Relay {
 
     public:
-      uint32_t _lastSwitchingTime;
+
+      uint32_t _lastOnTime;
+      uint32_t _nextStateTime;
+
+      RelayState _currentState;
+      RelayState _nextState;
 
     protected:
-      void activate(uint8_t& currentMask,uint8_t newMask,int8_t action) const;
-      int8_t validate(const uint8_t currentMask,uint8_t& newMask);
+      RelayState parseCommand();
+      bool nextStateIsValid(RelayState nextState,uint8_t currentMask,uint8_t& nextMask); 
+      uint32_t calculateSwitchingDelay(RelayState nextState);
 
     public:
       Relay();
+      
       void run(uint8_t& currentMask);
+      void checkSwitching();
   };
 
 
@@ -35,7 +43,10 @@ namespace brewery {
 
   template<class T,uint8_t TValidMask>
   inline Relay<T,TValidMask>::Relay() {
-    _lastSwitchingTime=0;
+    _lastOnTime=0;
+    _nextStateTime=0;
+    _currentState=RelayState::OFF;
+    _nextState=RelayState::OFF;
   }
 
 
@@ -46,22 +57,74 @@ namespace brewery {
   template<class T,uint8_t TValidMask>
   inline void Relay<T,TValidMask>::run(uint8_t& currentMask) {
 
-    int8_t action;
-    uint8_t newMask;
+    // get the proposed next state
 
-    action = validate(currentMask,newMask);
-    if(action!=-1)
-      activate(currentMask,newMask,action);
+    RelayState nextState = parseCommand();
+    if(nextState==RelayState::INVALID)
+      return;
+
+    // if the desired state is the same as the next state (possibly pending), nothing to do
+
+    if(_nextState==nextState) {
+      Uart::ok();
+      return;
+    }
+
+    // check for invalid state
+
+    uint8_t nextMask;
+
+    if(!nextStateIsValid(nextState,currentMask,nextMask))
+      return;
+
+    uint32_t switchingDelay=calculateSwitchingDelay(nextState);
+
+    // set up the time to make the switch
+
+    _nextState=nextState;
+    _nextStateTime=MillisecondTimer::millis()+switchingDelay;
+
+    if(switchingDelay) {
+
+      char buffer[100];
+      sprintf(buffer,"WARNING:01:Switch scheduled in %ldms",switchingDelay);
+      Uart::sendString(buffer,false);
+    }
+    else
+      Uart::ok();
   }
 
 
   /*
-   * validate command and return 1 if ON, 0 if OFF, and -1 if fail. If fail then a 
-   * response has already been sent
+   * Check for something to do
    */
 
   template<class T,uint8_t TValidMask>
-  inline int8_t Relay<T,TValidMask>::validate(const uint8_t currentMask,uint8_t& newMask) {
+  inline void Relay<T,TValidMask>::checkSwitching() {
+
+    uint32_t now=MillisecondTimer::millis();
+
+    if(_nextState!=_currentState && now>_nextStateTime) {
+
+      if(_nextState==RelayState::ON) {
+        _lastOnTime=now;
+        T::set();
+      }
+      else {
+        T::reset();
+      }
+
+      _currentState=_nextState;
+    }
+  }
+
+
+  /*
+   * Parse the command (ON/OFF)
+   */
+
+  template<class T,uint8_t TValidMask>
+  inline RelayState Relay<T,TValidMask>::parseCommand() {
 
     // get the parameter. there must be one
 
@@ -69,69 +132,86 @@ namespace brewery {
     
     if(parameter==nullptr) {
       Uart::sendString(MissingParameterString,true);
-      return -1;
+      return RelayState::INVALID;
     }
 
     // check for valid options
     
-    if(!strcasecmp(parameter,"ON")) {
+    if(!strcasecmp(parameter,"ON"))
+      return RelayState::ON;
+    else if(!strcasecmp(parameter,"OFF"))
+      return RelayState::OFF;
+
+    // invalid
+
+    Uart::sendString(UnknownParameterString,true);
+    return RelayState::INVALID;
+  }
+
+
+  /*
+   * Check if the desired state is permitted (e.g. CHILL not at same time as HEAT)
+   */
+
+  template<class T,uint8_t TValidMask>
+  inline bool Relay<T,TValidMask>::nextStateIsValid(RelayState nextState,uint8_t currentMask,uint8_t& nextMask) {
+
+    if(nextState==RelayState::ON) {
 
       // calculate the proposed new mask
 
-      newMask=currentMask | (1 << TValidMask);
+      nextMask=currentMask | (1 << TValidMask);
 
       // check it against the valid mask for the control being activated
 
       uint8_t validMask=Eeprom::Reader::validMask(TValidMask);
-      if((newMask & validMask) != newMask) {
+      if((nextMask & validMask) != nextMask) {
         Uart::sendString(InvalidStateString,true);
-        return -1;
+        return false;
       }
 
-      // to protect the relay from crazy software we do not allow switching
-      // more often than once every 10 seconds
-
-      if(_lastSwitchingTime==0 || MillisecondTimer::hasTimedOut(_lastSwitchingTime,10000)) {
-        _lastSwitchingTime=MillisecondTimer::millis();
-        return 1;
-      }
-      else {
-        Uart::sendString(RelayTimeoutString,true);
-        return -1;
-      }
+      return true;
     }
-    else if(!strcasecmp(parameter,"OFF")) {
+    else {
       
       // turning something off is always permitted
 
-      newMask=currentMask &~ (1 << TValidMask);
-      return 0;
-    }
-    else {
-      Uart::sendString(UnknownParameterString,true);
-      return -1;
+      nextMask=currentMask &~ (1 << TValidMask);
+      return true;
     }
   }
 
 
   /*
-   * Switch the relay and store the current mask
+   * Calculate the switching delay, if any
    */
 
   template<class T,uint8_t TValidMask>
-  inline void Relay<T,TValidMask>::activate(uint8_t& currentMask,uint8_t newMask,int8_t action) const {
+  inline uint32_t Relay<T,TValidMask>::calculateSwitchingDelay(RelayState nextState) {
+  
+    // always all OFF
 
-    if(action==1)
-      T::set();
-    else
-      T::reset();
+    if(nextState==RelayState::OFF || _lastOnTime==0)
+      return 0;
 
-    currentMask=newMask;
-    Uart::ok();
+    uint32_t difference=MillisecondTimer::difference(_lastOnTime);
+
+    // if we switched on less than 10 seconds ago then we need to pause
+    // if there's a custom blackout in effect then factor it in
+    
+    uint32_t customPeriod = T::getBlackoutPeriod();
+    uint32_t blackout = customPeriod>10000 ? customPeriod : 10000;
+
+    if(difference<blackout)
+      return blackout-difference;
+
+    return 0;
   }
+
 
   // basic relays onboard
 
   typedef Relay<GpioHeater,ValidMask::VALID_MASK_HEAT> Heater;
+  typedef Relay<GpioChiller,ValidMask::VALID_MASK_CHILL> Chiller;
   typedef Relay<GpioAux1,ValidMask::VALID_MASK_AUX1> Aux1;
 }

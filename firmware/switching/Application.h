@@ -22,15 +22,15 @@
 #include <avr/eeprom.h>
 #include <avr/wdt.h>
 #include <util/crc16.h>
- 
+
+#include "ValidMask.h"
+#include "RelayState.h"
+#include "Eeprom.h"
 #include "GpioPin.h"
 #include "ProgStrings.h"
 #include "MillisecondTimer.h"
-#include "ValidMask.h"
-#include "Eeprom.h"
 #include "Uart.h"
 #include "Relay.h"
-#include "Chiller.h"
 #include "TriacControl.h"
 #include "Aux2.h"
 #include "Id.h"
