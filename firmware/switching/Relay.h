@@ -83,6 +83,7 @@ namespace brewery {
 
     _nextState=nextState;
     _nextStateTime=MillisecondTimer::millis()+switchingDelay;
+    currentMask=nextMask;
 
     if(switchingDelay) {
 
