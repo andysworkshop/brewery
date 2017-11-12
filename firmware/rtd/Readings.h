@@ -30,7 +30,7 @@ namespace brewery {
 
     sprintf(
       buffer,
-      "{\"red\":{\"value\":\"%f\",\"code\":\"%u\"},\"blue\":{\"value\":\"%f\",\"code\":\"%u\"}}",
+      "{\"red\":{\"value\":\"%F\",\"code\":\"%u\"},\"blue\":{\"value\":\"%F\",\"code\":\"%u\"}}",
       rtdReadings.rtd2.temperature+Eeprom::Reader::redCal(),
       rtdReadings.rtd2.faultCode,
       rtdReadings.rtd1.temperature+Eeprom::Reader::blueCal(),
