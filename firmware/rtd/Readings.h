@@ -19,7 +19,7 @@ namespace brewery {
 
 
   /*
-   * Process the ID command
+   * Process the READINGS command
    */
 
   inline void Readings::run(RtdReadings& rtdReadings) {
