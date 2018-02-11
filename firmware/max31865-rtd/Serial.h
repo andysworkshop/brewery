@@ -1,6 +1,6 @@
 /*
- * Andy's Workshop Brewery RTD controller ATMega328p firmware
- * Copyright (c) 2017 Andy Brown. http://www.andybrown.me.uk
+ * Andy's Workshop Brewery Max31865 RTD controller ATMega328p firmware
+ * Copyright (c) 2018 Andy Brown. http://www.andybrown.me.uk
  * Please see website for licensing terms.
  */
 
