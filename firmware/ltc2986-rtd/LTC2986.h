@@ -80,7 +80,7 @@ namespace brewery {
     
     // -- Set any extra delay between conversions (in this case, 0*100us)
     
-    transferByte(WRITE_TO_RAM, 0xFF, 0);
+    transferByte(WRITE_TO_RAM, 0xFF, 255);
   }
 
 
@@ -211,6 +211,7 @@ namespace brewery {
   inline void LTC2986::run(RtdReadings& results) {
 
     measureChannel(4,TEMPERATURE,results.rtd1);      // Ch 4: RTD PT-100
+    MillisecondTimer::delay(25);
     measureChannel(8,TEMPERATURE,results.rtd2);      // Ch 8: RTD PT-100
   }
 
