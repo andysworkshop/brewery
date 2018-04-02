@@ -1,5 +1,5 @@
 /*
- * Andy's Workshop Brewery Relays controller ATMega328p firmware
+ * Andy's Workshop Brewery LTC2986 RTD controller ATMega328p firmware
  * Copyright (c) 2017 Andy Brown. http://www.andybrown.me.uk
  * Please see website for licensing terms.
  */
@@ -60,7 +60,8 @@ namespace brewery {
 
   /*
    * send a string, optionally from PROGMEM. The client will be waiting for this response
-   * so it's send synchronously because nothing else will be going on.
+   * so it's send synchronously because nothing else will be going on. That means the
+   * caller can pass buffer on the stack if necessary.
    */
 
   inline void Uart::sendString(const char *buffer,bool progmem) {

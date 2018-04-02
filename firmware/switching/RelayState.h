@@ -4,6 +4,15 @@
  * Please see website for licensing terms.
  */
 
- #pragma once
+#pragma once
 
- #define FIRMWARE_VERSION "2"
+
+namespace brewery {
+
+  enum class RelayState {
+    OFF = 0,
+    ON = 1,
+    INVALID = 2
+  };
+}
+

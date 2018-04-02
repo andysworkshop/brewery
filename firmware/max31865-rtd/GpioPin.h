@@ -1,6 +1,6 @@
 /*
- * Andy's Workshop Brewery Relays controller ATMega328p firmware
- * Copyright (c) 2017 Andy Brown. http://www.andybrown.me.uk
+ * Andy's Workshop Brewery Max31865 RTD controller ATMega328p firmware
+ * Copyright (c) 2018 Andy Brown. http://www.andybrown.me.uk
  * Please see website for licensing terms.
  */
 
@@ -81,6 +81,28 @@ namespace brewery {
       else
         reset();
     }
+
+
+    /*  
+     * Read the current value of a GPIO pin. Pin states can be read
+     * regardless of direction.
+     */
+
+    static bool read() {
+      
+      uint8_t r;
+
+      asm volatile(
+          "  clr  %[result]       \n\t"       // result = 0
+          "  sbic %[port],%[pin]  \n\t"       // skip next if port bit is clear
+          "  inc  %[result]       \n\t"       // result = 1
+        : [result] "=r" (r)
+        : [port]   "I"  (TPort),
+          [pin]    "I"  (TPin)
+      );
+
+      return r;
+    }
   };
 
 
@@ -123,27 +145,6 @@ namespace brewery {
            [pin]  "I" (TPin)
       );
     }
-
-
-    /*
-     * Read the current value of an input pin
-     */
-
-    static bool read() {
-      
-      uint8_t r;
-
-      asm volatile(
-          "  clr  %[result]       \n\t"       // result = 0
-          "  sbic %[port],%[pin]  \n\t"       // skip next if port bit is clear
-          "  inc  %[result]       \n\t"       // result = 1
-        : [result] "=r" (r)
-        : [port]   "I"  (TPort::Pin),
-          [pin]    "I"  (TPin)
-      );
-
-      return r;
-    }
   };
 
 
@@ -151,45 +152,29 @@ namespace brewery {
    * All pins used in this project
    */
 
-  typedef GpioOutputPin<GPIOC,3> GpioAux2;
   typedef GpioInputPin<GPIOD,0> GpioUartRx;
   typedef GpioOutputPin<GPIOD,1> GpioUartTx;
-  typedef GpioOutputPin<GPIOD,4> GpioResetUsb;
+  typedef GpioOutputPin<GPIOB,0> GpioResetUsb;
 
-  // AUX1 and HEAT don't have blackout periods
-
-  struct GpioAux1 : GpioOutputPin<GPIOB,0> {
-    static constexpr uint32_t getBlackoutPeriod() {
-      return 0;
-    }
-  };
-
-  struct GpioHeater : GpioOutputPin<GPIOB,1> {
-    static constexpr uint32_t getBlackoutPeriod() {
-      return 0;
-    }
-  };
-
-  // CHILL has a configurable blackout
+  typedef GpioOutputPin<GPIOD,5> GpioMaxCsRed;
+  typedef GpioOutputPin<GPIOD,7> GpioMaxCsBlue;
+  typedef GpioInputPin<GPIOB,1> GpioMaxDataReadyRed;
+  typedef GpioInputPin<GPIOD,6> GpioMaxDataReadyBlue;
   
-  struct GpioChiller : GpioOutputPin<GPIOB,2> {
-    static uint32_t getBlackoutPeriod() {
-      return Eeprom::Reader::chillBlackout();
-    }
-  };
+  typedef GpioOutputPin<GPIOC,0> GpioSpiCsLed;
+  typedef GpioOutputPin<GPIOC,1> GpioEnableLed;
+  typedef GpioInputPin<GPIOB,4> GpioSpiMiso;
+  typedef GpioOutputPin<GPIOB,5> GpioSpiClk;
+  typedef GpioOutputPin<GPIOB,2> GpioSpiSs;
 
-  struct GpioZeroSense : GpioInputPin<GPIOD,2> {
-    
-    static void setup() {
-      
-      // set as input. PD2 = INT0
+  typedef GpioOutputPin<GPIOD,2> GpioAlarm;
 
-      GpioInputPin<GPIOD,2>::setup();
+  struct GpioSpiMosi : GpioOutputPin<GPIOB,3> {
 
-      // configure the INT0 interrupt
-
-      EICRA = (1 << ISC01);     // both edges of INT0
-      EIMSK = (1 << INT0);      // INT0 enabled
+    static uint8_t writeByte(uint8_t b) {
+      SPDR=b;
+      while(!(SPSR & (1 << SPIF)));
+      return SPDR;
     }
   };
 }

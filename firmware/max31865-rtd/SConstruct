@@ -1,22 +1,13 @@
-# Andy's Workshop Brewery Relays controller ATMega328p firmware
+# Andy's Workshop Brewery Max31865 RTD controller ATMega328p firmware
 # Copyright (c) 2017 Andy Brown. http://www.andybrown.me.uk
 # Please see website for licensing terms.
 
 """
-Usage: scons mains=<FREQUENCY> [upload]
-
-  <FREQUENCY>: 50/60.
-    50 = 50Hz mains frequency
-    60 = 60Hz mains frequency
+Usage: scons [upload]
 
   [upload]
     specify this option to automatically upload to
     using avrdude to a USBASP connected MCU.
-
-Examples:
-
-  scons mains=50     // UK mains frequency
-  scons mains=60     // USA mains frequency
 
 To do a 'clean' use the -c flag
 To do a parallel build use the -jN flag
@@ -42,24 +33,6 @@ def createSerialNumber():
   return serial
 
 
-# The triac timer runs at 128uS per tick. The triac_pulse_ticks variable defines how many ticks
-# the triac gate will be activated for. 4 = 512uS
-
-triac_pulse_ticks=4
-margin_ticks=8
-
-# get the mains frequency option
-
-mains = ARGUMENTS.get('mains')
-
-if mains=="50":
-  ticks_per_half_cycle=78
-elif mains=="60":
-  ticks_per_half_cycle=65
-else:
-  print __doc__
-  Exit(1)
-
 # source the environment
 
 env=Environment(ENV=os.environ)
@@ -79,16 +52,13 @@ env.Replace(CC="avr-gcc")
 env.Replace(CXX="avr-g++")
 env.Replace(PROGSUFFIX=".elf")
 
-PROGRAM = "brewery-relays-"+mains+"hz-v"+VERSION
+PROGRAM = "brewery-max31865-rtd-v"+VERSION
 
 # set up our options
 
 env.Replace(CXXFLAGS=["-mmcu=atmega328p",
                       "-Os",
                       "-g",
-                      "-DTRIAC_PULSE_TICKS="+`triac_pulse_ticks`,
-                      "-DTICKS_PER_HALF_CYCLE="+`ticks_per_half_cycle`,
-                      "-DMARGIN_TICKS="+`margin_ticks`,
                       "-DF_CPU=8000000",
                       "-DBOARD_SERIAL=" + serial,
                       "-std=c++1y",
@@ -119,6 +89,9 @@ env.Replace(CFLAGS=["-mmcu=atmega328p",
 
 env.Replace(LINKFLAGS=["-Wl,-Map,"+PROGRAM+".map",
                        "-mrelax",
+                       "-Wl,-u,vfprintf",
+                       "-lprintf_flt",
+                       "-lm",
                        "-Wl,--gc-sections",
                        "-mmcu=atmega328p"])
 
@@ -130,6 +103,8 @@ Decider('timestamp-newer')
 # convert elf to hex flashable image
 
 hexfile=env.Command(PROGRAM+".hex",elf,"avr-objcopy -j .text -j .data -O ihex $SOURCE $TARGET")
+env.Install("bin",hexfile)
+env.Alias("install","bin")
 
 # calculate size and generate assembly source
 
@@ -145,8 +120,3 @@ upload=env.Alias("upload",PROGRAM+".hex",flash_cmd)
 fuse=env.Alias("fuse",PROGRAM+".hex",fuse_cmd)
 
 AlwaysBuild([upload,fuse])
-
-# installation
-
-env.Alias('install', "../../bin")
-env.Install("../../bin", hexfile)

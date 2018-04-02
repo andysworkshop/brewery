@@ -1,5 +1,5 @@
 /*
- * Andy's Workshop Brewery Relays controller ATMega328p firmware
+ * Andy's Workshop Brewery LTC2986 RTD controller ATMega328p firmware
  * Copyright (c) 2017 Andy Brown. http://www.andybrown.me.uk
  * Please see website for licensing terms.
  */
@@ -16,7 +16,7 @@ namespace brewery {
   extern const char UnknownParameterString[];
   extern const char OutOfRangeString[];
   extern const char VersionString[];
-  extern const char CapabilitiesString[];
   extern const char CopyrightString[];
-  extern const char InvalidStateString[];
+  extern const char CapabilitiesString[];
 }
+

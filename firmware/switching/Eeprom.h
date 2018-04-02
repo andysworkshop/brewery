@@ -21,8 +21,10 @@ namespace brewery {
      */
 
     enum Location : uint8_t {
-      MAGIC       = 0,     // 2 byte signature
-      VALID_MASKS = 2,     // 4 bytes
+      MAGIC          = 0,     // 2 byte signature
+      VALID_MASKS    = 2,     // 4 bytes
+      SERIAL         = 6,     // 4 bytes (BOARD_SERIAL macro)
+      CHILL_BLACKOUT = 10     // 4 bytes blackout period in millis
     };
 
     
@@ -31,7 +33,7 @@ namespace brewery {
      */
 
     enum {
-      MAGIC_NUMBER = 0xaa55
+      MAGIC_NUMBER = 0x55aa
     };
 
 
@@ -47,7 +49,11 @@ namespace brewery {
       public:
         static uint16_t magic();
         static uint8_t readByte(uint8_t l);
+        static uint32_t readUint32(Location l);
+
         static uint8_t validMask(uint8_t index);
+        static uint32_t serial();
+        static uint32_t chillBlackout();
     };
 
 
@@ -57,8 +63,12 @@ namespace brewery {
 
     struct Writer {
       static void magic();
+      static void writeUint32(Location l,uint32_t u);
       static void writeByte(uint8_t l,uint8_t b);
+
       static void validMask(uint8_t index,uint8_t b);
+      static void serial();
+      static void chillBlackout(uint32_t b);
     };
   };
 
@@ -72,6 +82,15 @@ namespace brewery {
     // read and return the byte
 
     return eeprom_read_byte(reinterpret_cast<uint8_t *>(l));
+  }
+
+
+  /*
+   * Read a uint32_t
+   */
+
+  inline uint32_t Eeprom::Reader::readUint32(Location l) {
+    return eeprom_read_dword(reinterpret_cast<uint32_t *>(l));
   }
 
 
@@ -94,11 +113,38 @@ namespace brewery {
 
 
   /*
+   * Read the serial number
+   */
+
+  inline uint32_t Eeprom::Reader::serial() {
+    return readUint32(Location::SERIAL);
+  }
+
+
+  /*
+   * Read the chill blackout
+   */
+
+  inline uint32_t Eeprom::Reader::chillBlackout() {
+    return readUint32(Location::CHILL_BLACKOUT);
+  }
+
+
+  /*
    * Write a byte to the location
    */
 
   inline void Eeprom::Writer::writeByte(uint8_t l,uint8_t b) {
     eeprom_write_byte(reinterpret_cast<uint8_t *>(l),b);
+  }
+
+
+  /*
+   * Write a uint32_t to the location
+   */
+
+  inline void Eeprom::Writer::writeUint32(Location l,uint32_t u) {
+    eeprom_write_dword(reinterpret_cast<uint32_t *>(l),u);
   }
 
 
@@ -117,6 +163,24 @@ namespace brewery {
 
   inline void Eeprom::Writer::validMask(uint8_t index,uint8_t b) {
     eeprom_write_byte(reinterpret_cast<uint8_t *>(Location::VALID_MASKS+index),b);
+  }
+
+
+  /*
+   * Write the board serial number
+   */
+
+  inline void Eeprom::Writer::serial() {
+    writeUint32(Location::SERIAL,BOARD_SERIAL);
+  }
+
+
+  /*
+   * Write the chill blackout
+   */
+
+  inline void Eeprom::Writer::chillBlackout(uint32_t b) {
+    writeUint32(Location::CHILL_BLACKOUT,b);
   }
 
 
@@ -148,6 +212,8 @@ namespace brewery {
     Writer::validMask(ValidMask::VALID_MASK_AUX1,0b0010);
     Writer::validMask(ValidMask::VALID_MASK_AUX2,0b0001);
 
+    Writer::chillBlackout(300000l);  // 5 minutes
+    Writer::serial();
     Writer::magic();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Andy's Workshop Brewery Relays controller ATMega328p firmware
+ * Andy's Workshop Brewery LTC2986 RTD controller ATMega328p firmware
  * Copyright (c) 2017 Andy Brown. http://www.andybrown.me.uk
  * Please see website for licensing terms.
  */
@@ -22,23 +22,28 @@
 #include <avr/eeprom.h>
 #include <avr/wdt.h>
 #include <util/crc16.h>
-
-#include "ValidMask.h"
-#include "RelayState.h"
-#include "Eeprom.h"
+ 
+#include "FirmwareVersion.h"
 #include "GpioPin.h"
 #include "ProgStrings.h"
 #include "MillisecondTimer.h"
+#include "AlarmState.h"
+#include "Eeprom.h"
 #include "Uart.h"
-#include "Relay.h"
-#include "TriacControl.h"
-#include "Aux2.h"
+#include "Max7221.h"
+#include "LTC2986Constants.h"
+#include "RtdReadings.h"
+#include "LTC2986.h"
+#include "Calibration.h"
+#include "AlarmFlasher.h"
+#include "Alarm.h"
 #include "Id.h"
-#include "Capabilities.h"
 #include "Copyright.h"
 #include "Version.h"
 #include "Serial.h"
+#include "Capabilities.h"
 #include "Uptime.h"
-#include "Valid.h"
-#include "Chillout.h"
+#include "Readings.h"
+#include "Displays.h"
+#include "CommandProcessor.h"
 #include "Program.h"

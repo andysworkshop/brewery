@@ -21,6 +21,9 @@ namespace brewery {
     Aux1 _aux1;
     uint8_t _currentMask{0};
 
+  protected:
+    void checkSwitching();
+
   public:
     void run();
     void runCommand();
@@ -54,6 +57,10 @@ namespace brewery {
 
     for(;;) {
 
+      // check for switching activity
+
+      checkSwitching();
+
       // check for commands to process
 
       runCommand();
@@ -62,6 +69,17 @@ namespace brewery {
 
       wdt_reset();
     }
+  }
+
+
+  /*
+   * Check if a relay needs to be switched
+   */
+
+  inline void Program::checkSwitching() {
+    _heater.checkSwitching();
+    _chiller.checkSwitching();
+    _aux1.checkSwitching();
   }
 
 
@@ -100,6 +118,10 @@ namespace brewery {
       Uptime::run();
     else if(!strcasecmp("VALID",commandPtr))
       Valid::run();
+    else if(!strcasecmp("SERIAL",commandPtr))
+      Serial::run();
+    else if(!strcasecmp("CHILLOUT",commandPtr))
+      Chillout::run();
     else
       Uart::sendString(UnknownCommandString,true);
   }
